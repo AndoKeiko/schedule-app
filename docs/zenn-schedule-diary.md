@@ -359,6 +359,7 @@ function createWindow() {
 
   if (process.env.NODE_ENV === 'development') {
     win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
   } else {
     win.loadFile(path.join(__dirname, 'dist/index.html'));
   }
@@ -441,6 +442,10 @@ JSON の保存では、いきなり本番ファイルへ上書きせず、いっ
 これは、既存データを編集して日付を変更したときに、古い日付の記録が残らないようにするためです。
 
 たとえば `2026-06-16` の記録を開いて、日付を `2026-06-17` に変更して保存した場合、古い `2026-06-16` は削除され、新しい `2026-06-17` として保存されます。
+
+開発中は `win.webContents.openDevTools()` を呼んでいるので、Electron のウィンドウと一緒に DevTools も開きます。
+
+React 側のエラーや `console.log()` を確認したいときに便利です。
 
 ## preload.js を作る
 

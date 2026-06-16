@@ -132,6 +132,7 @@ function createWindow() {
   if (process.env.NODE_ENV === 'development') {
     // 開発中は Vite の dev server を表示します。
     win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
   } else {
     // 配布版ではビルド済みの HTML を表示します。
     win.loadFile(path.join(__dirname, 'dist/index.html'));
