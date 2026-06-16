@@ -1363,6 +1363,14 @@ textarea {
 </html>
 ```
 
+:::message
+開発中に Vite の HMR や開発サーバー由来のコードが CSP に引っかかる場合があります。
+
+その場合は、開発時だけ `script-src` に `'unsafe-eval'` や `'unsafe-inline'` を一時的に許可する、または開発用と配布用で CSP を切り替える方法があります。
+
+ただし、配布版では CSP をむやみに緩めないほうが安全です。この記事ではローカル日記アプリとしての安全性を優先し、本番寄りの制限を入れています。
+:::
+
 ## JSON の保存場所
 
 JSON は exe と同じフォルダではなく、Electron の `app.getPath("userData")` に保存します。
