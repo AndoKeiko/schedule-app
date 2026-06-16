@@ -974,6 +974,10 @@ textarea {
   font: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -990,6 +994,62 @@ textarea {
   color: #ffffff;
 }
 
+.eyebrow {
+  margin: 0 0 4px;
+  color: #7d8b6f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.app-header .eyebrow {
+  color: #c9d6ad;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.header-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.header-stats span {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #eef2e6;
+  white-space: nowrap;
+}
+
+.notice {
+  margin: 12px 24px 0;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.notice.error {
+  background: #fff1f0;
+  border: 1px solid #f2b8b5;
+  color: #8f1d18;
+}
+
 .workspace {
   flex: 1;
   display: grid;
@@ -1003,6 +1063,47 @@ textarea {
   flex-direction: column;
   border-right: 1px solid #deded4;
   background: #efefe8;
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #deded4;
+}
+
+.small-btn,
+.ghost-btn,
+.primary-btn,
+.danger-btn,
+.add-btn,
+.icon-btn {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  min-height: 34px;
+}
+
+.small-btn,
+.ghost-btn {
+  background: #ffffff;
+  border-color: #d7d7cb;
+  color: #30343a;
+  padding: 7px 12px;
+}
+
+.primary-btn {
+  background: #20242a;
+  color: #ffffff;
+  padding: 8px 18px;
+}
+
+.danger-btn {
+  background: #fff4f2;
+  border-color: #dfb4ac;
+  color: #9a2b20;
+  padding: 8px 14px;
 }
 
 .entry-list {
@@ -1032,6 +1133,45 @@ textarea {
   background: #fbfcf6;
 }
 
+.entry-date {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.entry-meta,
+.entry-title,
+.entry-memo {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-meta {
+  color: #69705f;
+  font-size: 12px;
+}
+
+.entry-title {
+  color: #373b41;
+}
+
+.entry-memo {
+  color: #747b84;
+  font-size: 12px;
+}
+
+.empty {
+  display: grid;
+  gap: 6px;
+  color: #747b84;
+  padding: 28px 16px;
+}
+
+.empty strong {
+  color: #373b41;
+}
+
 .editor {
   min-height: 0;
   overflow: auto;
@@ -1041,10 +1181,31 @@ textarea {
   gap: 16px;
 }
 
+.editor-head,
+.bottom-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #626a73;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .task-header,
@@ -1067,14 +1228,109 @@ textarea {
   outline: none;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #6d7c55;
+  box-shadow: 0 0 0 3px rgba(109, 124, 85, 0.14);
+}
+
+.task-header {
+  color: #747b84;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.task-list {
+  display: grid;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 38px;
+  min-width: 38px;
+  background: #ffffff;
+  border-color: #d7d7cb;
+  color: #777d86;
+  font-weight: 700;
+}
+
+.icon-btn.danger:hover {
+  border-color: #dfb4ac;
+  color: #9a2b20;
+}
+
+.add-btn {
+  width: 100%;
+  border-style: dashed;
+  border-color: #c9c9bb;
+  color: #4f5f3f;
+  background: transparent;
+  padding: 9px 12px;
+}
+
 textarea {
   min-height: 150px;
   resize: vertical;
   line-height: 1.55;
 }
-```
 
-実際のアプリでは、このあとボタンやフッターなどのスタイルを追加して整えます。
+.memo-field textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.save-message {
+  min-height: 20px;
+  color: #4f5f3f;
+  font-weight: 700;
+}
+
+.app-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #deded4;
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #626a73;
+  font-size: 12px;
+}
+
+.app-footer code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #22252a;
+}
+
+@media (max-width: 860px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    max-height: 260px;
+    border-right: 0;
+    border-bottom: 1px solid #deded4;
+  }
+
+  .task-header {
+    display: none;
+  }
+
+  .task-row {
+    grid-template-columns: 1fr 1fr 38px;
+  }
+
+  .inp-task,
+  .inp-cat {
+    grid-column: span 2;
+  }
+}
+```
 
 ## index.html を設定する
 
