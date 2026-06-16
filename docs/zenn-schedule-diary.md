@@ -212,6 +212,10 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
 });
 ```
 
@@ -227,6 +231,14 @@ Vite のデフォルト設定では、ビルド後の `index.html` から JavaSc
 `base: './'` を指定すると、ビルド後のパスが `./assets/...` のような相対パスになります。
 
 そのため、Electron の `loadFile()` でも JavaScript や CSS を正しく読み込めます。
+:::
+
+:::message
+この記事では、Vite の開発サーバーを `5173` 番ポートに固定しています。
+
+`package.json` の `wait-on http://localhost:5173` や、Electron 側の `win.loadURL('http://localhost:5173')` と合わせるためです。
+
+もし別のプロジェクトが 5173 番ポートを使っている場合は、先にそのプロセスを止めるか、`vite.config.js`、`package.json`、`main.js` のポート番号を同じ値に変更してください。
 :::
 
 ## main.js を作る
