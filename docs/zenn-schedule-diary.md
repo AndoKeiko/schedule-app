@@ -142,6 +142,7 @@ schedule-app/
 ├─ main.js
 ├─ preload.js
 ├─ package.json
+├─ vite.config.js
 ├─ index.html
 ├─ src/
 │  ├─ main.jsx
@@ -199,6 +200,32 @@ schedule-app/
 Vite の開発サーバーを起動してから、Electron のウィンドウを開きます。
 
 `dist` は配布用 exe を作るためのコマンドです。
+
+## vite.config.js を設定する
+
+Electron で Vite のビルド結果を読み込む場合は、`vite.config.js` に `base: './'` を指定します。
+
+```js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  base: './',
+});
+```
+
+この設定は、配布版で画面が真っ白になる問題を防ぐために重要です。
+
+Vite のデフォルト設定では、ビルド後の `index.html` から JavaScript や CSS を読むパスが `/assets/...` のような絶対パスになります。
+
+ブラウザで Web サーバーから表示する場合はそれで動きますが、Electron の配布版では `win.loadFile()` でローカルの `dist/index.html` を読み込みます。
+
+そのとき `/assets/...` のような絶対パスだと、アセットを正しく見つけられず、画面が真っ白になることがあります。
+
+`base: './'` を指定すると、ビルド後のパスが `./assets/...` のような相対パスになります。
+
+そのため、Electron の `loadFile()` でも JavaScript や CSS を正しく読み込めます。
 
 ## main.js を作る
 
