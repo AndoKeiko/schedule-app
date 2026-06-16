@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import TaskRow from './TaskRow';
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 // 新しい作業行を作るための初期値です。
 // id は React が行を見分けるために必要です。
@@ -84,10 +90,10 @@ function EditView({ selectedEntry, onSave, onDelete, onNew }) {
     setMessage('保存しました');
   };
 
-  // 削除は取り消しにくい操作なので、confirm で確認してから実行します。
+  // 削除は取り消しにくい操作なので、Electron のネイティブダイアログで確認してから実行します。
   const handleDelete = async () => {
     if (!hasSavedEntry) return;
-    const ok = window.confirm(`${entry.date} の記録を削除しますか？`);
+    const ok = await window.scheduleApi.confirmDelete(entry.date);
     if (!ok) return;
     await onDelete(entry.date);
     onNew();

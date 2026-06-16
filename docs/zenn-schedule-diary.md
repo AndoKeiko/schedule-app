@@ -233,8 +233,14 @@ Vite のデフォルト設定では、ビルド後の `index.html` から JavaSc
 
 ウィンドウ作成、JSON の読み込み、保存、削除を担当します。
 
+ここでは `import` ではなく `require` を使っています。
+
+React 側のコードは Vite が ES Modules として扱うため `import` を使いますが、Electron の `main.js` は Node.js 側で CommonJS として実行する構成にしているためです。
+
+このように、React 側と Electron の main プロセス側で書き方が少し違っていても問題ありません。
+
 ```js
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 const path = require('path');
 const fs = require('fs/promises');
 
@@ -253,9 +259,17 @@ function isDateString(value) {
   return /^\d{4}-\d{2}-\d{2}$/.test(String(value ?? ''));
 }
 
+function todayLocal() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function normalizeDate(value) {
   const date = normalizeText(value, 10);
-  return isDateString(date) ? date : new Date().toISOString().slice(0, 10);
+  return isDateString(date) ? date : todayLocal();
 }
 
 function normalizeTask(task, index) {
@@ -380,6 +394,22 @@ app.whenReady().then(() => {
 
   ipcMain.handle('schedule:get-data-path', async () => dataPath());
 
+  ipcMain.handle('schedule:confirm-delete', async (event, date) => {
+    const parent = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showMessageBox(parent, {
+      type: 'warning',
+      buttons: ['削除', 'キャンセル'],
+      defaultId: 1,
+      cancelId: 1,
+      title: '記録の削除',
+      message: `${normalizeDate(date)} の記録を削除しますか？`,
+      detail: 'この操作は取り消せません。',
+      noLink: true,
+    });
+
+    return result.response === 0;
+  });
+
   createWindow();
 });
 
@@ -416,6 +446,7 @@ const api = {
   saveEntry: (entry, previousDate) => ipcRenderer.invoke('schedule:save-entry', entry, previousDate),
   deleteEntry: (date) => ipcRenderer.invoke('schedule:delete-entry', date),
   getDataPath: () => ipcRenderer.invoke('schedule:get-data-path'),
+  confirmDelete: (date) => ipcRenderer.invoke('schedule:confirm-delete', date),
 };
 
 contextBridge.exposeInMainWorld('scheduleApi', Object.freeze(api));
@@ -584,7 +615,13 @@ export default App;
 import { useEffect, useMemo, useState } from 'react';
 import TaskRow from './TaskRow';
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const blankTask = () => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -660,7 +697,7 @@ function EditView({ selectedEntry, onSave, onDelete, onNew }) {
 
   const handleDelete = async () => {
     if (!hasSavedEntry) return;
-    const ok = window.confirm(`${entry.date} の記録を削除しますか？`);
+    const ok = await window.scheduleApi.confirmDelete(entry.date);
     if (!ok) return;
     await onDelete(entry.date);
     onNew();
@@ -775,6 +812,16 @@ export default EditView;
 ```
 
 `weather` と `weight` は、最初から保存データの一部として扱っています。
+
+日付の初期値には `toISOString()` を使わず、ローカル時刻から `YYYY-MM-DD` を作っています。
+
+`toISOString()` は UTC 基準の日付になるため、日本時間の夜に実行すると翌日の日付になってしまうことがあります。
+
+日記アプリでは「今いる場所の今日」を使いたいので、`getFullYear()`、`getMonth()`、`getDate()` からローカル日付を作るようにしています。
+
+削除確認は `window.confirm()` ではなく、`preload.js` 経由で main プロセスの `dialog.showMessageBox()` を呼び出しています。
+
+Electron のネイティブな確認ダイアログを使うことで、デスクトップアプリらしい挙動になります。
 
 ## 作業入力の1行を作る
 

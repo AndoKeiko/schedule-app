@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 const path = require('path');
 const fs = require('fs/promises');
 
@@ -22,9 +22,17 @@ function isDateString(value) {
   return /^\d{4}-\d{2}-\d{2}$/.test(String(value ?? ''));
 }
 
+function todayLocal() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function normalizeDate(value) {
   const date = normalizeText(value, 10);
-  return isDateString(date) ? date : new Date().toISOString().slice(0, 10);
+  return isDateString(date) ? date : todayLocal();
 }
 
 // 1行分の作業データを安全な形にそろえます。
@@ -165,6 +173,22 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('schedule:get-data-path', async () => dataPath());
+
+  ipcMain.handle('schedule:confirm-delete', async (event, date) => {
+    const parent = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showMessageBox(parent, {
+      type: 'warning',
+      buttons: ['削除', 'キャンセル'],
+      defaultId: 1,
+      cancelId: 1,
+      title: '記録の削除',
+      message: `${normalizeDate(date)} の記録を削除しますか？`,
+      detail: 'この操作は取り消せません。',
+      noLink: true,
+    });
+
+    return result.response === 0;
+  });
 
   createWindow();
 });

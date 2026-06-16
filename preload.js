@@ -8,6 +8,7 @@ const api = {
   saveEntry: (entry, previousDate) => ipcRenderer.invoke('schedule:save-entry', entry, previousDate),
   deleteEntry: (date) => ipcRenderer.invoke('schedule:delete-entry', date),
   getDataPath: () => ipcRenderer.invoke('schedule:get-data-path'),
+  confirmDelete: (date) => ipcRenderer.invoke('schedule:confirm-delete', date),
 };
 
 // Object.freeze で API の差し替えを防ぎ、公開面を小さく保ちます。
